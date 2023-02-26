@@ -45,7 +45,7 @@ class RandomChar extends Component {
     }
 
     onCharRandom = () => {
-        this.setState({error: false});
+        this.setState({error: false, loading: true});
         this.updateChar()
     }
 
@@ -80,7 +80,7 @@ class RandomChar extends Component {
 
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
-    const styles = thumbnail.includes('image_not') ? {objectFit: 'contain'} : null;
+    const styles = thumbnail.includes('image_not') ? {objectFit: 'unset'} : null;
 
     return (
         <div className="randomchar__block">
