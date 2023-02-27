@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/udemyReactMarvel/static/css/main.f204cc3b.css",
+    "main.js": "/udemyReactMarvel/static/js/main.db9f2467.js",
+    "static/media/vision.png": "/udemyReactMarvel/static/media/vision.067d4ae1936d64a577ce.png",
+    "static/media/mjolnir.png": "/udemyReactMarvel/static/media/mjolnir.61f31e1809f12183a524.png",
+    "static/media/error.gif": "/udemyReactMarvel/static/media/error.42292aa12b6bc303ce99.gif",
+    "index.html": "/udemyReactMarvel/index.html",
+    "main.f204cc3b.css.map": "/udemyReactMarvel/static/css/main.f204cc3b.css.map",
+    "main.db9f2467.js.map": "/udemyReactMarvel/static/js/main.db9f2467.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f204cc3b.css",
+    "static/js/main.db9f2467.js"
+  ]
+}
