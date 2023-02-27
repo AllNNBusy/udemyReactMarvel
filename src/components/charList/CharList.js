@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React,{ Component } from 'react';
 import PropTypes from 'prop-types';
 
 import MarvelService from '../../services/MarvelService';
@@ -16,6 +16,7 @@ class CharList extends Component {
         offset: 210,
         charactersEnded: false
     }
+
 
     marvelService = new MarvelService();
 
@@ -59,11 +60,20 @@ class CharList extends Component {
         })
     }
 
+    onKeyClick = (e, id) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            this.props.onCharSelected(id);
+        }
+    }
+
     renderItems(arr) {
         const items = arr.map(({name, thumbnail, id}) => {
             const styles = thumbnail.includes('image_not') ? {objectFit: 'unset'} : null;
             return (
                 <li
+                    onKeyDown={(e) => this.onKeyClick(e, id)}
+                    tabIndex={0}
                     key={id}
                     className="char__item"
                     onClick={() => this.props.onCharSelected(id)}>
