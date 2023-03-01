@@ -32,5 +32,10 @@
         &:hover {
             transform: translateY(-5px);
         }
+        a {
+            &:focus {
+                transform: translateY(-5px);
+            }
+        }
     }
 }
