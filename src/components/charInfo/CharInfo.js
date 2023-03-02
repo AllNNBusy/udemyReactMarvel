@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
-import Skeleton from '../skeleton/Skeleton'
+import Skeleton from '../skeleton/Skeleton';
 
 import './charInfo.scss';
 
@@ -50,7 +51,6 @@ const CharInfo = (props) => {
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki, comics} = char;
     const styles = thumbnail.includes('image_not') ? {objectFit: 'unset'} : null;
-
     let items = null;
 
     if (comics.length === 0) {
@@ -62,7 +62,8 @@ const View = ({char}) => {
                 break
             }
 
-            const item = <li key={i} className="char__comics-item">{comics[i].name}</li>
+            const comicId = char?.comics[i]?.resourceURI?.match(/\d+/g)[1];
+            const item = <Link to={`/comics/${comicId}`} key={i} className="char__comics-item">{comics[i].name}</Link>
             items.push(item);
         }
     }
