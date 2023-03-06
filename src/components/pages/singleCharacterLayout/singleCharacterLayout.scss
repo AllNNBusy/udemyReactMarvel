@@ -1,0 +1,24 @@
+@import '../../../style/variables.scss';
+
+.single-character {
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: 293px 550px;
+    column-gap: 50px;
+    align-items: start;
+    &__img {
+        width: 293px;
+        height: 450px;
+        object-fit: unset;
+    }
+    &__name {
+        font-weight: bold;
+        font-size: 22px;
+        line-height: 29px;
+    }
+    &__descr {
+        font-size: 18px;
+        line-height: 24px;
+        margin-top: 25px;
+    }
+}
