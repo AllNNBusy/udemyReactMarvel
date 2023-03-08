@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/udemyReactMarvel/static/css/main.6bc5c559.css",
-    "main.js": "/udemyReactMarvel/static/js/main.dc9fe7da.js",
+    "main.js": "/udemyReactMarvel/static/js/main.54503281.js",
     "static/js/346.baad5058.chunk.js": "/udemyReactMarvel/static/js/346.baad5058.chunk.js",
     "static/css/77.7fb979a2.chunk.css": "/udemyReactMarvel/static/css/77.7fb979a2.chunk.css",
     "static/js/77.0ae43d1c.chunk.js": "/udemyReactMarvel/static/js/77.0ae43d1c.chunk.js",
@@ -18,7 +18,7 @@
     "static/media/Avengers_logo.png": "/udemyReactMarvel/static/media/Avengers_logo.9eaf219344d83362e830.png",
     "index.html": "/udemyReactMarvel/index.html",
     "main.6bc5c559.css.map": "/udemyReactMarvel/static/css/main.6bc5c559.css.map",
-    "main.dc9fe7da.js.map": "/udemyReactMarvel/static/js/main.dc9fe7da.js.map",
+    "main.54503281.js.map": "/udemyReactMarvel/static/js/main.54503281.js.map",
     "346.baad5058.chunk.js.map": "/udemyReactMarvel/static/js/346.baad5058.chunk.js.map",
     "77.7fb979a2.chunk.css.map": "/udemyReactMarvel/static/css/77.7fb979a2.chunk.css.map",
     "77.0ae43d1c.chunk.js.map": "/udemyReactMarvel/static/js/77.0ae43d1c.chunk.js.map",
@@ -31,6 +31,6 @@
   },
   "entrypoints": [
     "static/css/main.6bc5c559.css",
-    "static/js/main.dc9fe7da.js"
+    "static/js/main.54503281.js"
   ]
 }
