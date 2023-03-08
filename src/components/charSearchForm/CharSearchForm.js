@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import useMarvelService from '../../services/MarvelService';
@@ -6,46 +6,66 @@ import ErrorMessage from '../errorMessage/ErrorMessage';
 
 import './charSearchForm.scss'
 
+const setSearchContent = (searchProcess, Component, data) => {
+
+    switch(searchProcess) {
+        case 'waiting':
+            return null;
+        case 'cheked':
+            return <div className="char__search-error">This field is required</div>;
+        case 'confirmed':
+            return <Component data={data}/>;
+        case 'error':
+            return <div className="char__search-error">'The character was not found. Check the name and try again'</div>;
+        case 'criticalError':
+            return <div className="char__search-critical-error"><ErrorMessage /></div>;
+        default:
+            throw new Error('Unexpected process state');
+    }
+}
+
 const CharSearchForm = () => {
     const [name, setName] = useState('');
-    const [nameDirty, setNameDirty] = useState(false);
     const [char, setChar] = useState(null);
-    const [noChar, setNoChar] = useState(null);
+    const [searchProcess, setSearchProcess] = useState('waiting');
+    const {getCharByName, process} = useMarvelService();
 
-    const {loading, error, clearError, getCharByName} = useMarvelService();
+    useEffect(() => {
+        if (process === 'error') {
+            setSearchProcess('criticalError');
+        }
+    }, [process])
+
+    const chekedName = () => {
+        if (!name) {
+            setSearchProcess('cheked');
+        }
+    }
 
     const handleChange = (name) => {
         setName(name);
-        if (!name) {
-            setNameDirty(true);
-            setChar(null);
-            setNoChar(null);
-        }
+        setSearchProcess('waiting');
     }
 
     const onRequestByName = (e) => {
         e.preventDefault();
 
-        name ? getCharByName(name).then(onLoadedByName) : setNameDirty(true)
-    }
-
-    const onLoadedByName = (newChar) => {
-        setNameDirty(false);
-        clearError();
-
-        if (newChar.name) {
-            setChar(newChar);
-            setNoChar(null);
+        if (!name) {
+            setSearchProcess('cheked');
         } else {
-            setNoChar('The character was not found. Check the name and try again');
-            setChar(null);
+            getCharByName(name)
+                .then(res => res.name ? onLoadedByName(res) : setSearchProcess('error'))
         }
     }
 
-    const content = char ? <View char={char}/> : null;
-    const noContent = noChar ? <div className="char__search-error">{noChar}</div> : null;
-    const validError = nameDirty && !name ? <div className="char__search-error">This field is required</div> : null;
-    const errorMessage = error ? <div className="char__search-critical-error"><ErrorMessage /></div> : null;
+    const onLoadedByName = (newChar) => {
+        setSearchProcess('confirmed');
+        setChar(newChar);
+    }
+
+    const content = useMemo(() => {
+        return setSearchContent(searchProcess, View, char)
+    }, [searchProcess])
 
     return (
         <form className="char__search-form">
@@ -55,26 +75,23 @@ const CharSearchForm = () => {
                     name="name"
                     type='text'
                     placeholder="Enter name"
-                    onBlur={() => setNameDirty(true)}
+                    onBlur={chekedName}
                     onChange={e => handleChange(e.target.value)}/>
                 <button
                     type='submit'
                     className="button button__main"
-                    disabled={loading}
                     onClick={e => onRequestByName(e)}>
                     <div className="inner">find</div>
                 </button>
             </div>
             {content}
-            {noContent}
-            {validError}
-            {errorMessage}
         </form>
     )
 }
 
-const View = ({char}) => {
-    const {id, name} = char;
+const View = ({data}) => {
+
+    const {id, name} = data;
 
     return (
         <div className="char__search-wrapper">

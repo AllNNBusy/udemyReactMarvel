@@ -1,18 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import useMarvelService from '../../services/MarvelService';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
-import Skeleton from '../skeleton/Skeleton';
+import { setItemContent } from '../../utils/setContent';
 
 import './charInfo.scss';
 
 const CharInfo = (props) => {
     const [char, setChar] = useState(null);
 
-    const {loading, error, getCharacter, clearError} = useMarvelService()
+    const {getCharacter, clearError, process, setProcess} = useMarvelService();
 
     useEffect(() => {
         updateChar();
@@ -27,29 +25,22 @@ const CharInfo = (props) => {
         clearError();
         getCharacter(charId)
             .then(onCharLoaded)
+            .then(() => setProcess('confirmed'));
     }
 
     const onCharLoaded = (char) => {
         setChar(char);
     }
 
-    const skeleton = char || loading || error ? null : <Skeleton/>;
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error || !char) ? <View char={char}/> : null;
-
     return (
         <div className="char__info">
-            {skeleton}
-            {errorMessage}
-            {spinner}
-            {content}
+            {setItemContent(process, View, char)}
         </div>
     )
 }
 
-const View = ({char}) => {
-    const {name, description, thumbnail, homepage, wiki, comics} = char;
+const View = memo(({data}) => {
+    const {name, description, thumbnail, homepage, wiki, comics} = data;
     const styles = thumbnail.includes('image_not') ? {objectFit: 'unset'} : null;
     let items = null;
 
@@ -62,7 +53,7 @@ const View = ({char}) => {
                 break
             }
 
-            const comicId = char?.comics[i]?.resourceURI?.match(/\d+/g)[1];
+            const comicId = data?.comics[i]?.resourceURI?.match(/\d+/g)[1];
             const item = <Link to={`/comics/${comicId}`} key={i} className="char__comics-item">{comics[i].name}</Link>
             items.push(item);
         }
@@ -93,7 +84,7 @@ const View = ({char}) => {
             </ul>
         </>
     )
-}
+})
 
 CharInfo.propTypes = {
     charId: PropTypes.number

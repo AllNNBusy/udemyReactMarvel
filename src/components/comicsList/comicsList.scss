@@ -1,3 +1,5 @@
+@import '../../style/animation.scss';
+
 .comics {
     &__list {
         margin-top: 45px;
@@ -10,6 +12,7 @@
     }
     &__item {
         transition: 0.3s transform;
+        animation: addingTransparency 0.5s ease-in;
         &-img {
             box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.25);
             width: 225px;
@@ -36,20 +39,6 @@
             &:focus {
                 transform: translateY(-5px);
             }
-        }
-        &-enter {
-            opacity: 0;
-        }
-        &-enter-active {
-            opacity: 1;
-            transition: opacity 500ms ease-in;
-        }
-        &-exit {
-            opacity: 1;
-        }
-        &-exit-active {
-            opacity: 0;
-            transition: opacity 500ms ease-in;
         }
     }
 }

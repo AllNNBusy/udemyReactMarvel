@@ -1,4 +1,5 @@
 @import '../../../style/variables.scss';
+@import '../../../style/animation.scss';
 
 .single-character {
     margin-top: 50px;
@@ -6,6 +7,7 @@
     grid-template-columns: 293px 550px;
     column-gap: 50px;
     align-items: start;
+    animation: addingTransparency 0.5s ease-in;
     &__img {
         width: 293px;
         height: 450px;
