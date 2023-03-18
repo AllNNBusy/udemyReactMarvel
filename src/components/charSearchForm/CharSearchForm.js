@@ -1,13 +1,11 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useLazyGetNameHeroesQuery } from '../../api/apiSlice';
 
-import useMarvelService from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/ErrorMessage';
-
 import './charSearchForm.scss'
 
 const setSearchContent = (searchProcess, Component, data) => {
-
     switch(searchProcess) {
         case 'waiting':
             return null;
@@ -26,61 +24,65 @@ const setSearchContent = (searchProcess, Component, data) => {
 
 const CharSearchForm = () => {
     const [name, setName] = useState('');
+    const [fetchHero, {error, isLoading}] = useLazyGetNameHeroesQuery();
     const [char, setChar] = useState(null);
-    const [searchProcess, setSearchProcess] = useState('waiting');
-    const {getCharByName, process} = useMarvelService();
+    const [process, setProcess] = useState('waiting');
 
     useEffect(() => {
-        if (process === 'error') {
-            setSearchProcess('criticalError');
+        if (error) {
+            setProcess('criticalError');
         }
-    }, [process])
+    }, [error])
 
     const chekedName = () => {
         if (!name) {
-            setSearchProcess('cheked');
+            setProcess('cheked');
         }
     }
 
     const handleChange = (name) => {
         setName(name);
-        setSearchProcess('waiting');
+        setProcess('waiting');
     }
 
     const onRequestByName = (e) => {
         e.preventDefault();
 
         if (!name) {
-            setSearchProcess('cheked');
+            setProcess('cheked');
         } else {
-            getCharByName(name)
-                .then(res => res.name ? onLoadedByName(res) : setSearchProcess('error'))
+            fetchHero(name)
+                .then(res => res.data.data.results[0] ? onLoadedByName(res.data.data.results[0]) : setProcess('error'))
         }
     }
 
     const onLoadedByName = (newChar) => {
-        setSearchProcess('confirmed');
+        setProcess('confirmed');
         setChar(newChar);
     }
 
     const content = useMemo(() => {
-        return setSearchContent(searchProcess, View, char)
-    }, [searchProcess])
+        return setSearchContent(process, View, char);
+        // eslint-disable-next-line
+    }, [process])
 
     return (
-        <form className="char__search-form">
+        <form className="char__search-form" onSubmit={(e) => onRequestByName(e)}>
             <label className="char__search-label" htmlFor="name">Or find a character by name:</label>
             <div className="char__search-wrapper">
                 <input
                     name="name"
                     type='text'
                     placeholder="Enter name"
+                    value={name}
                     onBlur={chekedName}
-                    onChange={e => handleChange(e.target.value)}/>
+                    onChange={e => handleChange(e.target.value)}
+                    />
                 <button
                     type='submit'
                     className="button button__main"
-                    onClick={e => onRequestByName(e)}>
+                    disabled={isLoading}
+                    >
                     <div className="inner">find</div>
                 </button>
             </div>
@@ -90,7 +92,6 @@ const CharSearchForm = () => {
 }
 
 const View = ({data}) => {
-
     const {id, name} = data;
 
     return (

@@ -1,34 +1,29 @@
+import { transformCharacter, transformComics } from './transformData';
+
 import Spinner from '../components/spinner/Spinner';
 import ErrorMessage from '../components/errorMessage/ErrorMessage';
-import Skeleton from '../components/skeleton/Skeleton';
 
-export const setItemContent = (process, Component, data) => {
-
-    switch(process) {
-        case 'waiting':
-            return <Skeleton/>;
-        case 'loading':
-            return <Spinner/>;
-        case 'confirmed':
-            return <Component data={data}/>;
-        case 'error':
-            return <ErrorMessage/>;
-        default:
-            throw new Error('Unexpected process state');
+export const setRndContent = ({isLoading, isFetching, isError, isSuccess}, Component, data) => {
+    if (isError) {
+        return <ErrorMessage/>;
+    } else if (isLoading || isFetching) {
+        return <Spinner />;
+    } else if (!isFetching && isSuccess) {
+        const transformData = transformCharacter(data.data.results[0]);
+        return <Component data={transformData}/>
     }
 }
 
-export const setItemsContent = (process, content, newItemLoading) => {
-    switch(process) {
-        case 'waiting':
-            return <Spinner/>;
-        case 'loading':
-            return newItemLoading ? content : <Spinner/>;
-        case 'confirmed':
-            return content;
-        case 'error':
-            return <ErrorMessage/>;
-        default:
-            throw new Error('Unexpected process state');
+export const setSinglePageContent = ({comicLoading, heroLoading, comicError, heroError}, Component, data, dataType) => {
+    if (comicLoading || heroLoading) {
+        return <Spinner />;
+    } else if (comicError || heroError) {
+        return <ErrorMessage/>;
+    } else if (data && dataType === 'comic') {
+        const transformData = transformComics(data.data.data.results[0]);
+        return <Component data={transformData}/>
+    } else if (data && dataType === 'character') {
+        const transformData = transformCharacter(data.data.data.results[0]);
+        return <Component data={transformData}/>
     }
 }

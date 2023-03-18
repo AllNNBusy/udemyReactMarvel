@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import './singleComicLayout.scss';
 
 const SingleComicLayout = ({data}) => {
-    const {thumbnail, name, description, pageCount, language, price} = data;
+    const {name, thumbnail, description, pageCount, language, price} = data;
 
     return (
         <div className="single-comic">

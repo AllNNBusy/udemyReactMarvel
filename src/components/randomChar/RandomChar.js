@@ -1,34 +1,24 @@
-import { useState, useEffect } from 'react';
-
-import useMarvelService from '../../services/MarvelService';
-import { setItemContent } from '../../utils/setContent';
+import { useDispatch, useSelector } from 'react-redux';
+import { useGetIdHeroesQuery } from '../../api/apiSlice';
+import { getRndHeroes } from '../charList/heroesSlice';
+import { setRndContent } from '../../utils/setContent';
 
 import mjolnir from '../../resources/img/mjolnir.png';
 import './randomChar.scss';
 
 const RandomChar = () => {
-    const [char, setChar] = useState(null);
-    const {getCharacter, clearError, process, setProcess} = useMarvelService();
+    const dispatch = useDispatch();
+    const {id} = useSelector(state => state.heroes);
+    const {data, isError, isLoading, isFetching, isSuccess} = useGetIdHeroesQuery(id);
 
-    useEffect(() => {
-        updateChar();
-    }, [])
-
-    const onCharLoaded = (char) => {
-        setChar(char);
-    }
-
-    const updateChar = () => {
-        clearError();
-        const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-        getCharacter(id)
-            .then(onCharLoaded)
-            .then(() => setProcess('confirmed'));
+    const rndHeroes = () => {
+        const rnd =  Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
+        dispatch(getRndHeroes(rnd));
     }
 
     return (
         <div className="randomchar">
-            {setItemContent(process, View, char)}
+            {setRndContent({isLoading, isFetching, isError, isSuccess}, View, data)}
             <div className="randomchar__static">
                 <p className="randomchar__title">
                     Random character for today!<br/>
@@ -37,14 +27,17 @@ const RandomChar = () => {
                 <p className="randomchar__title">
                     Or choose another one
                 </p>
-                <button onClick={updateChar} className="button button__main">
+                <button
+                    onClick={() => rndHeroes()}
+                    className="button button__main"
+                    disabled={isFetching}>
                     <div className="inner">try it</div>
                 </button>
                 <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
             </div>
         </div>
     );
-}
+};
 
 const View = ({data}) => {
     const {name, description, thumbnail, homepage, wiki} = data;

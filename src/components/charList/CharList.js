@@ -1,39 +1,43 @@
-import { useEffect, useMemo } from 'react';
-import PropTypes from 'prop-types';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useGetHeroesListQuery } from '../../api/apiSlice';
+import { getHeroes } from './heroesSlice';
+import { transformCharacter } from '../../utils/transformData';
 
-import useMarvelService from '../../services/MarvelService';
-import useStatusFetch from '../../hooks/statusFetch.hook';
-import { setItemsContent } from '../../utils/setContent';
+import Spinner from '../spinner/Spinner';
+import ErrorMessage from '../errorMessage/ErrorMessage';
 
 import './charList.scss';
 
-const CharList = (props) => {
-    const {getAllCharacters, process, setProcess} = useMarvelService();
-    const {itemsMarvel, offset, newItemLoading, itemsEnded, onRequest} = useStatusFetch(getAllCharacters, 210, 9);
+const CharList = () => {
+    const dispatch = useDispatch();
+    const [limit, setLimit] = useState(9);
+    const {data: chartersList, isLoading, isError, isFetching} = useGetHeroesListQuery(limit);
 
-    useEffect(() => {
-        if (itemsMarvel && process === 'loading') {
-            setProcess('confirmed');
-        }
-    }, [itemsMarvel])
+    if(isLoading) return <Spinner/>;
+    if(isError) return <ErrorMessage/>;
 
-    const onKeyClick = (e, id) => {
+    const onKeyClick = (e, item) => {
         if (e.key === ' ' || e.key === 'Enter') {
             e.preventDefault();
-            props.onCharSelected(id);
+            dispatch(getHeroes(item));
         }
     }
 
     function renderItems(arr) {
-        const items = arr.map(({thumbnail, name, id}) => {
+        if (!arr) return;
+
+        const items = arr.map(item => {
+            const {thumbnail, name, id} = item;
             const styles = thumbnail.includes('image_not') ? {objectFit: 'unset'} : null;
             return (
                 <li
                     key={id}
-                    onKeyDown={(e) => onKeyClick(e, id)}
+                    onKeyDown={(e) => onKeyClick(e, item)}
                     tabIndex={0}
                     className="char__item"
-                    onClick={() => props.onCharSelected(id)}>
+                    onClick={() => dispatch(getHeroes(item))}
+                    >
                     <img src={thumbnail} alt={name} style={styles}/>
                     <div className="char__name">{name}</div>
                 </li>
@@ -47,27 +51,24 @@ const CharList = (props) => {
         )
     }
 
-    const elements = useMemo(() => {
-        const content = renderItems(itemsMarvel);
-        return setItemsContent(process, content, newItemLoading);
-    }, [process])
+    let elements = null;
+    if (chartersList) {
+        const data = transformCharacter(chartersList.data.results);
+        elements = renderItems(data);
+    }
 
     return (
         <div className="char__list">
             {elements}
             <button
                 className="button button__main button__long"
-                disabled={newItemLoading}
-                style={{'display': itemsEnded ? 'none' : 'block'}}
-                onClick={() => onRequest(offset)}>
+                disabled={isFetching}
+                onClick={() => setLimit(limit => limit + 9)}
+                >
                 <div className="inner">load more</div>
             </button>
         </div>
     )
-}
-
-CharList.propTypes = {
-    onCharSelected: PropTypes.func.isRequired
 }
 
 export default CharList;

@@ -1,28 +1,29 @@
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import AppBanner from "../appBanner/AppBanner";
+import { useLazyGetIdComicQuery, useLazyGetIdHeroesQuery } from '../../api/apiSlice';
+import { setSinglePageContent } from '../../utils/setContent';
 
-import useMarvelService from '../../services/MarvelService';
-import { setItemContent } from '../../utils/setContent';
+import AppBanner from "../appBanner/AppBanner";
 
 const SinglePage = ({Component, dataType}) => {
     const {id} = useParams();
     const [data, setData] = useState(null);
-    const {clearError, getComic, getCharacter, process, setProcess} = useMarvelService();
+    const [getComic, {isLoading: comicLoading, isError: comicError}] = useLazyGetIdComicQuery();
+    const [getHero, {isLoading: heroLoading, isError: heroError}] = useLazyGetIdHeroesQuery();
 
     useEffect(() => {
         updateComic();
+        // eslint-disable-next-line
     }, [id])
 
     const updateComic = () => {
-        clearError();
 
         switch (dataType) {
             case 'comic':
-                getComic(id).then(onDataLoaded).then(() => setProcess('confirmed'));
+                getComic(id).then(onDataLoaded);
                 break;
             case 'character':
-                getCharacter(id).then(onDataLoaded).then(() => setProcess('confirmed'));
+                getHero(id).then(onDataLoaded);
                 break;
             default:
                 return
@@ -36,7 +37,7 @@ const SinglePage = ({Component, dataType}) => {
     return (
         <>
             <AppBanner/>
-            {setItemContent(process, Component, data)}
+            {setSinglePageContent({comicLoading, heroLoading, comicError, heroError}, Component, data, dataType)}
         </>
     )
 }

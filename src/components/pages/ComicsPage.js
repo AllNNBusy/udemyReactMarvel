@@ -1,6 +1,7 @@
+import { Helmet } from "react-helmet";
+
 import ComicsList from "../comicsList/ComicsList";
 import AppBanner from "../appBanner/AppBanner";
-import { Helmet } from "react-helmet";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 const ComicsPage = () => {

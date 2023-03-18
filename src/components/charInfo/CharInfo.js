@@ -1,50 +1,28 @@
-import { useState, useEffect, memo } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 
-import useMarvelService from '../../services/MarvelService';
-import { setItemContent } from '../../utils/setContent';
+import Skeleton from '../skeleton/Skeleton';
 
 import './charInfo.scss';
 
-const CharInfo = (props) => {
-    const [char, setChar] = useState(null);
-
-    const {getCharacter, clearError, process, setProcess} = useMarvelService();
-
-    useEffect(() => {
-        updateChar();
-    }, [props.charId])
-
-    const updateChar = () => {
-        const {charId} = props;
-        if (!charId) {
-            return;
-        }
-
-        clearError();
-        getCharacter(charId)
-            .then(onCharLoaded)
-            .then(() => setProcess('confirmed'));
-    }
-
-    const onCharLoaded = (char) => {
-        setChar(char);
-    }
+const CharInfo = () => {
+    const {char} = useSelector(state => state.heroes);
+    const elements = char ? <View char={char}/> : <Skeleton/>;
 
     return (
         <div className="char__info">
-            {setItemContent(process, View, char)}
+            {elements}
         </div>
     )
 }
 
-const View = memo(({data}) => {
-    const {name, description, thumbnail, homepage, wiki, comics} = data;
+const View = ({char}) => {
+    const {comics, name, thumbnail, description, homepage, wiki} = char;
+
     const styles = thumbnail.includes('image_not') ? {objectFit: 'unset'} : null;
     let items = null;
 
-    if (comics.length === 0) {
+    if (!comics.length) {
         items = <li className="char__comics-item">No comics with "{name}"</li>
     } else {
         items = [];
@@ -53,7 +31,7 @@ const View = memo(({data}) => {
                 break
             }
 
-            const comicId = data?.comics[i]?.resourceURI?.match(/\d+/g)[1];
+            const comicId = char?.comics[i]?.resourceURI?.match(/\d+/g)[1];
             const item = <Link to={`/comics/${comicId}`} key={i} className="char__comics-item">{comics[i].name}</Link>
             items.push(item);
         }
@@ -84,10 +62,6 @@ const View = memo(({data}) => {
             </ul>
         </>
     )
-})
-
-CharInfo.propTypes = {
-    charId: PropTypes.number
 }
 
 export default CharInfo;

@@ -1,43 +1,42 @@
-import { useEffect, useMemo, memo } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useGetComicsListQuery } from '../../api/apiSlice';
+import { transformComics } from '../../utils/transformData';
 
-import useMarvelService from '../../services/MarvelService';
-import useStatusFetch from '../../hooks/statusFetch.hook';
-import { setItemsContent } from '../../utils/setContent';
+import Spinner from '../spinner/Spinner';
+import ErrorMessage from '../errorMessage/ErrorMessage';
 
 import './comicsList.scss';
 
 const ComicsList = () => {
-    const {getAllComics, process, setProcess} = useMarvelService();
-    const {itemsMarvel, offset, newItemLoading, itemsEnded, onRequest} = useStatusFetch(getAllComics, 20, 8);
+    const [limit, setLimit] = useState(8);
+    const {data: comicsList, isLoading, isError, isFetching} = useGetComicsListQuery(limit);
 
-    useEffect(() => {
-        if (itemsMarvel && process === 'loading') {
-            setProcess('confirmed');
-        }
-    }, [itemsMarvel])
+    if(isLoading) return <Spinner/>;
+    if(isError) return <ErrorMessage/>;
 
-    const elements = useMemo(() => {
-        const content = <View itemsMarvel={itemsMarvel}/>;
-        return setItemsContent(process, content, newItemLoading);
-    }, [process])
+    let elements = null;
+    if (comicsList) {
+        const data = transformComics(comicsList.data.results);
+        elements = <View data={data}/>;
+    }
 
     return (
         <div className="comics__list">
             {elements}
             <button
                 className="button button__main button__long"
-                style={{'display': itemsEnded ? 'none' : 'block'}}
-                disabled={newItemLoading}
-                onClick={() => onRequest(offset)}>
+                disabled={isFetching}
+                onClick={() => setLimit(limit => limit + 8)}>
                 <div className="inner">load more</div>
             </button>
         </div>
     )
 }
 
-const View = memo(({itemsMarvel}) => {
-    const items = itemsMarvel.map(({id, name, thumbnail, price}) => {
+const View = ({data}) => {
+    const items = data.map(({id, name, thumbnail, price}) => {
+
         return (
             <li
                 key={id}
@@ -56,6 +55,6 @@ const View = memo(({itemsMarvel}) => {
             {items}
         </ul>
     )
-})
+}
 
 export default ComicsList;
